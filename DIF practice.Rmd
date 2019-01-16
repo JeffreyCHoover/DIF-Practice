@@ -1,0 +1,66 @@
+---
+title: "DIF Investigation"
+author: "Jeff Hoover"
+date: "January 16, 2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+library(tidyverse)
+library(csvread)
+library(difR)
+library(tinytex)
+
+setwd("S:/Projects/DLM Secure/Staff Projects/Jeff Projects/DIF")
+```
+
+```{r}
+data <- read.csv("Big 5 data.csv", sep="\t")
+
+data <- data %>%
+  filter(E1>0 & E2>0 & E3>0 & E4>0 & E5>0 & E6>0 & E7>0 & E8>0 & E9>0 &E10>0)%>%
+  mutate(E1a = ifelse(E1 == 3, 1, 0),
+         E2a = ifelse(E2 == 3, 1, 0),
+         E3a = ifelse(E3 == 3, 1, 0),
+         E4a = ifelse(E4 == 3, 1, 0),
+         E5a = ifelse(E5 == 3, 1, 0),
+         E6a = ifelse(E6 == 3, 1, 0),
+         E7a = ifelse(E7 == 3, 1, 0),
+         E8a = ifelse(E8 == 3, 1, 0),
+         E9a = ifelse(E9 == 3, 1, 0),
+         E10a = ifelse(E10 == 3, 1, 0)) %>%
+  select(gender, E1a, E2a, E3a, E4a, E5a, E6a, E7a, E8a, E9a, E10a) %>%
+  filter(gender == 1 | gender == 2)
+```
+
+# DIF Analyses
+
+```{r}
+uniform <- difLogistic(Data = data, group = "gender", focal.name = 2,
+        type ="udif", criterion ="LRT", alpha = 0.05)
+combined <- difLogistic(Data = data, group = "gender", focal.name = 2,
+        type ="both", criterion ="LRT", alpha = 0.05)
+MH <- difMH(Data = data, group = "gender", focal.name = 2, MHstat = "MHChisq",
+        alpha = 0.05)
+```
+
+##Uniform DIF LR-LRT
+```{r}
+print(uniform)
+```
+
+\pagebreak
+
+##Combined DIF LR-LRT
+```{r}
+print(combined)
+```
+
+\pagebreak
+
+##MH DIF
+```{r}
+print(MH)
+```
